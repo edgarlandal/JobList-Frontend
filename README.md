@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Colores
+Color	HEX	Uso
+Índigo	#4F46E5	Botón principal, enlaces y logo
+Índigo oscuro	#4338CA	Botón al pasar el cursor
+Verde azulado	#0F766E	Acentos y confirmaciones
+Azul noche	#0F172A	Títulos y texto principal
+Gris pizarra	#475569	Texto secundario
+Gris claro	#F8FAFC	Fondo general
+Blanco	#FFFFFF	Tarjetas y formularios
+Gris de borde	#CBD5E1	Bordes de campos

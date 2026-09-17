@@ -1,0 +1,11 @@
+| Color         | HEX       | Uso                             |
+| ------------- | --------- | ------------------------------- |
+| Índigo        | `#4F46E5` | Botón principal, enlaces y logo |
+| Índigo oscuro | `#4338CA` | Botón al pasar el cursor        |
+| Verde azulado | `#0F766E` | Acentos y confirmaciones        |
+| Azul noche    | `#0F172A` | Títulos y texto principal       |
+| Gris pizarra  | `#475569` | Texto secundario                |
+| Gris claro    | `#F8FAFC` | Fondo general                   |
+| Blanco        | `#FFFFFF` | Tarjetas y formularios          |
+| Gris de borde | `#CBD5E1` | Bordes de campos                |
+
