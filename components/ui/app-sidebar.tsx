@@ -80,6 +80,8 @@ export default function AppSidebar() {
               alt="joblist"
               width={300}
               height={200}
+              loading="eager"
+              style={{ width: "150px", maxWidth: "100%", height: "auto" }}
             />
           </span>
 
@@ -91,6 +93,8 @@ export default function AppSidebar() {
                   alt="joblist"
                   width={150}
                   height={100}
+                  loading="eager"
+                  style={{ width: "150px", maxWidth: "100%", height: "auto" }}
                 />
               </span>
             </span>
@@ -109,47 +113,43 @@ export default function AppSidebar() {
           <SidebarGroupContent>
             <nav aria-label="Main navigation">
               <SidebarMenu className="gap-1.5">
-                {options.map(
-                  ({ title, url, icon: Icon, upcoming = false }) => {
-                    const isActive =
-                      pathname === url ||
-                      (url !== "/dashboard" &&
-                        (pathname?.startsWith(`${url}/`) ?? false));
+                {options.map(({ title, url, icon: Icon, upcoming = false }) => {
+                  const isActive =
+                    pathname === url ||
+                    (url !== "/dashboard" &&
+                      (pathname?.startsWith(`${url}/`) ?? false));
 
-                    return (
-                      <SidebarMenuItem key={url}>
-                        <SidebarMenuButton
-                          render={
-                            upcoming ? undefined : (
-                              <Link
-                                href={url}
-                                onClick={() => setOpenMobile(false)}
-                              />
-                            )
-                          }
-                          disabled={upcoming}
-                          isActive={isActive}
-                          aria-current={isActive ? "page" : undefined}
-                          aria-label={
-                            upcoming ? `${title}, coming soon` : title
-                          }
-                          tooltip={title}
-                          className="h-11 gap-3 rounded-lg transition-colors motion-reduce:transition-none data-active:font-bold data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:hover:bg-sidebar-primary-hover"
-                        >
-                          <Icon aria-hidden="true" />
+                  return (
+                    <SidebarMenuItem key={url}>
+                      <SidebarMenuButton
+                        render={
+                          upcoming ? undefined : (
+                            <Link
+                              href={url}
+                              onClick={() => setOpenMobile(false)}
+                            />
+                          )
+                        }
+                        disabled={upcoming}
+                        isActive={isActive}
+                        aria-current={isActive ? "page" : undefined}
+                        aria-label={upcoming ? `${title}, coming soon` : title}
+                        tooltip={title}
+                        className="h-11 gap-3 rounded-lg transition-colors motion-reduce:transition-none data-active:font-bold data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:hover:bg-sidebar-primary-hover"
+                      >
+                        <Icon aria-hidden="true" />
 
-                          <span>{title}</span>
+                        <span>{title}</span>
 
-                          {upcoming && (
-                            <span className="ml-auto text-[10px] group-data-[collapsible=icon]:hidden">
-                              Soon
-                            </span>
-                          )}
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  }
-                )}
+                        {upcoming && (
+                          <span className="ml-auto text-[10px] group-data-[collapsible=icon]:hidden">
+                            Soon
+                          </span>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </nav>
           </SidebarGroupContent>

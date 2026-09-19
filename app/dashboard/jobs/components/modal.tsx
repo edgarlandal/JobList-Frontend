@@ -22,19 +22,23 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useId, useRef, useState } from "react";
+import { useId, useRef, useState, type ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
 
 import { BriefcaseBusiness, Plus, X } from "lucide-react";
 import { JobForm } from "./job-form";
 
+type DrawerOpenChangeHandler = NonNullable<
+  ComponentProps<typeof Drawer>
+>["onOpenChange"];
+
 export function ModalCreateJob() {
   const [open, setOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-
   const [formVersion, setFormVersion] = useState(0);
   const hasChanges = useRef(false);
-  const keepEditingRef = useRef(null);
+  
+  const keepEditingRef = useRef<HTMLButtonElement>(null);
   const formId = useId();
   const isMobile = useIsMobile();
 
@@ -42,7 +46,10 @@ export function ModalCreateJob() {
     hasChanges.current = true;
   }
 
-  function handleOpenChange(nextOpen, eventDetails) {
+  const handleOpenChange: DrawerOpenChangeHandler = (
+    nextOpen,
+    eventDetails,
+  ) => {
     if (!nextOpen && hasChanges.current) {
       eventDetails.cancel();
       setAlertOpen(true);
@@ -53,8 +60,9 @@ export function ModalCreateJob() {
       hasChanges.current = false;
       setFormVersion((version) => version + 1);
     }
+
     setOpen(nextOpen);
-  }
+  };
 
   function discardApplication() {
     hasChanges.current = false;
@@ -104,7 +112,11 @@ export function ModalCreateJob() {
           </DrawerClose>
         </DrawerHeader>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#E7F0F0] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-6">
-          <JobForm key={formVersion} formId={formId} markChanged={markChanged} />
+          <JobForm
+            key={formVersion}
+            formId={formId}
+            markChanged={markChanged}
+          />
         </div>
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
           <AlertDialogContent
@@ -117,7 +129,8 @@ export function ModalCreateJob() {
                 Discard this application?
               </AlertDialogTitle>
               <AlertDialogDescription className="text-[#475569]">
-                All entered information will be lost. Are you sure you want to leave?
+                All entered information will be lost. Are you sure you want to
+                leave?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="border-[#0F766E]/20 bg-[#DCEBE9]">

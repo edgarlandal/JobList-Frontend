@@ -15,9 +15,13 @@ export default function Login() {
             width={300}
             height={200}
             priority
+            loading="eager"
             className="mx-auto mb-4 h-auto w-44"
+            style={{ width: "150px", maxWidth: "100%", height: "auto" }}
           />
-          <h1 id="login-title" className="text-2xl font-bold tracking-tight">Login</h1>
+          <h1 id="login-title" className="text-2xl font-bold tracking-tight">
+            Login
+          </h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Sign in to your account to continue.
           </p>

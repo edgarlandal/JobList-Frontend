@@ -1,4 +1,28 @@
-import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
+
+export type Job = {
+  id: string | number;
+  enterprise: string;
+  role: string;
+  salary: number;
+  type_salary: string;
+  location: string;
+  mode: string;
+  status: string;
+  last_update_at: string;
+};
+
+type JobsTableProps = {
+  jobs: Job[];
+};
 
 const salaryFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
@@ -11,31 +35,38 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-const statusClasses = {
+const defaultStatusClass =
+  "bg-[#F8FAFC] text-[#475569] ring-[#CBD5E1]";
+
+const statusClasses: Record<string, string | undefined> = {
   "In progress": "bg-[#0F766E]/10 text-[#0F766E] ring-[#0F766E]/20",
   HR: "bg-[#0F172A]/10 text-[#0F172A] ring-[#0F172A]/20",
   Rejected: "bg-[#475569]/10 text-[#475569] ring-[#475569]/20",
-  Cancelled: "bg-[#F8FAFC] text-[#475569] ring-[#CBD5E1]",
+  Cancelled: defaultStatusClass,
 };
 
-export function JobsTable({ jobs }) {
+export function JobsTable({ jobs }: JobsTableProps) {
   return (
     <Table className="min-w-[960px] [&_th]:px-5 [&_td]:px-5 [&_td]:py-4">
       <TableCaption className="sr-only">
         Job applications: company, role, salary, work arrangement, location,
         status, and last updated.
       </TableCaption>
+
       <TableHeader>
         <TableRow className="border-[#0F172A] bg-[#0F172A] hover:bg-[#0F172A] [&_th]:h-12 [&_th]:text-xs [&_th]:font-bold [&_th]:text-white">
           <TableHead scope="col">Company / Role</TableHead>
+
           <TableHead scope="col" className="text-right">
             Salary
           </TableHead>
+
           <TableHead scope="col">Location</TableHead>
           <TableHead scope="col">Status</TableHead>
           <TableHead scope="col">Last updated</TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {jobs.length === 0 ? (
           <TableRow className="bg-[#F0F6F5] hover:bg-[#E0EEEB]">
@@ -60,22 +91,26 @@ export function JobsTable({ jobs }) {
                   >
                     {job.enterprise.trim().slice(0, 2).toUpperCase()}
                   </span>
+
                   <div className="min-w-0">
                     <p className="font-bold leading-snug">
                       {job.enterprise.trim()}
                     </p>
+
                     <p className="mt-1 text-xs leading-relaxed text-[#475569]">
                       {job.role.trim()}
                     </p>
                   </div>
                 </div>
               </TableCell>
+
               <TableCell className="text-right tabular-nums">
                 {job.salary > 0 ? (
                   <>
                     <p className="font-semibold">
                       ${salaryFormatter.format(job.salary)}
                     </p>
+
                     <p className="mt-1 text-xs text-[#475569]">
                       {job.type_salary === "NA"
                         ? "Pay period not specified"
@@ -88,17 +123,22 @@ export function JobsTable({ jobs }) {
                   </span>
                 )}
               </TableCell>
+
               <TableCell className="text-[#475569]">
                 <p className="font-bold leading-snug">
                   {job.location.trim()}
                 </p>
+
                 <p className="mt-1 text-xs leading-relaxed text-[#475569]">
                   {job.mode.trim()}
                 </p>
               </TableCell>
+
               <TableCell>
                 <span
-                  className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusClasses[job.status] ?? statusClasses.Cancelled}`}
+                  className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                    statusClasses[job.status] ?? defaultStatusClass
+                  }`}
                 >
                   <span
                     aria-hidden="true"
@@ -107,6 +147,7 @@ export function JobsTable({ jobs }) {
                   {job.status}
                 </span>
               </TableCell>
+
               <TableCell className="text-xs text-[#475569] tabular-nums">
                 <time dateTime={job.last_update_at}>
                   {dateFormatter.format(
@@ -119,6 +160,5 @@ export function JobsTable({ jobs }) {
         )}
       </TableBody>
     </Table>
-
   );
 }

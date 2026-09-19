@@ -2,26 +2,35 @@
 
 import { useState } from "react";
 
-export function usePagination(items, initialPageSize = 5) {
+export function usePagination<T>(
+  items: readonly T[],
+  initialPageSize: number = 5,
+) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(initialPageSize);
+
   const total = items.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const currentPage = Math.min(page, totalPages);
   const startIndex = (currentPage - 1) * pageSize;
 
-  function changePage(nextPage) {
+  function changePage(nextPage: number) {
     setPage(Math.max(1, Math.min(nextPage, totalPages)));
   }
 
-  function changePageSize(size) {
+  function changePageSize(size: number) {
     setPageSize(size);
     setPage(1);
   }
 
   return {
     items: items.slice(startIndex, startIndex + pageSize),
-    total, totalPages, currentPage, startIndex, pageSize,
-    changePage, changePageSize,
+    total,
+    totalPages,
+    currentPage,
+    startIndex,
+    pageSize,
+    changePage,
+    changePageSize,
   };
 }

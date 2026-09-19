@@ -1,10 +1,14 @@
 import { ModalCreateJob } from "./modal";
 
-export function JobsHeader({ total }) {
+type JobsHeaderProps = {
+  total: number;
+};
+
+export function JobsHeader({ total }: JobsHeaderProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#0F766E]/30 bg-[linear-gradient(115deg,#0F172A_0%,#0F766E_100%)] p-6 shadow-sm md:p-8">
       <div>
-        <div className=" flex flex-row gap-6">
+        <div className="flex flex-row gap-6">
           <h1
             id="applications-title"
             className="text-2xl font-extrabold tracking-tight text-white"
@@ -16,6 +20,7 @@ export function JobsHeader({ total }) {
             {total} applications
           </span>
         </div>
+
         <p className="mt-2 text-sm text-[#F8FAFC]">
           All your opportunities in one place.
         </p>
@@ -23,6 +28,5 @@ export function JobsHeader({ total }) {
 
       <ModalCreateJob />
     </div>
-
   );
 }
