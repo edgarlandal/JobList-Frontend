@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import axios from "axios";
+
+import { SubmitEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+
 import api from "@/lib/api";
 
 export function LoginForm() {
@@ -16,11 +19,13 @@ export function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (loading) return;
+
     setError("");
     setLoading(true);
+
     const formData = new URLSearchParams();
     formData.set("username", username);
     formData.set("password", password);
@@ -30,11 +35,22 @@ export function LoginForm() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
       router.push("/dashboard");
-    } catch (error) {
-      const detail = error.response?.data?.detail;
-      setError(Array.isArray(detail)
-        ? detail.map((item) => `${item.loc.join(".")} : ${item.msg}`).join("\n")
-        : typeof detail === "string" ? detail : "Unable to sign in. Please try again.");
+    } catch (error: unknown) {
+      if (axios.isAxiosError<LoginErrorResponse>(error)) {
+        const detail = error.response.data.detail;
+
+        setError(
+          Array.isArray(detail)
+            ? detail
+                .map((item) => `${item.loc.join(".")} : ${item.msg}`)
+                .join("\n")
+            : typeof detail === "string"
+              ? detail
+              : "Unable to sign in. Please try again.",
+        );
+      } else {
+        setError("An unexpected error ocurred. Please try again");
+      }
     } finally {
       setLoading(false);
     }
@@ -43,7 +59,10 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" aria-busy={loading}>
       <div className="space-y-2">
-        <Label htmlFor="username" className="text-sm font-medium text-slate-700">
+        <Label
+          htmlFor="username"
+          className="text-sm font-medium text-slate-700"
+        >
           Username or email
         </Label>
         <Input
@@ -63,7 +82,10 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+        <Label
+          htmlFor="password"
+          className="text-sm font-medium text-slate-700"
+        >
           Password
         </Label>
         <div className="relative">
@@ -87,13 +109,20 @@ export function LoginForm() {
             aria-pressed={showPassword}
             className="absolute right-0 top-0 flex size-11 items-center justify-center rounded-lg text-slate-400 transition-colors hover:text-teal-700 focus-visible:outline-2 focus-visible:outline-teal-600 disabled:opacity-50"
           >
-            {showPassword ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
+            {showPassword ? (
+              <EyeOff aria-hidden="true" className="size-4" />
+            ) : (
+              <Eye aria-hidden="true" className="size-4" />
+            )}
           </button>
         </div>
       </div>
 
       {error && (
-        <p role="alert" className="whitespace-pre-line rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p
+          role="alert"
+          className="whitespace-pre-line rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+        >
           {error}
         </p>
       )}
@@ -103,7 +132,17 @@ export function LoginForm() {
         disabled={loading}
         className="h-11 w-full rounded-lg bg-teal-700 font-semibold text-white hover:bg-teal-800 focus-visible:ring-teal-600/25"
       >
-        {loading ? <><LoaderCircle aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" /> Signing in...</> : "Login"}
+        {loading ? (
+          <>
+            <LoaderCircle
+              aria-hidden="true"
+              className="size-4 animate-spin motion-reduce:animate-none"
+            />{" "}
+            Signing in...
+          </>
+        ) : (
+          "Login"
+        )}
       </Button>
     </form>
   );

@@ -3,10 +3,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-function Table({
-  className,
-  ...props
-}) {
+function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
@@ -21,10 +18,7 @@ function Table({
   )
 }
 
-function TableHeader({
-  className,
-  ...props
-}) {
+function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
@@ -34,10 +28,7 @@ function TableHeader({
   )
 }
 
-function TableBody({
-  className,
-  ...props
-}) {
+function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   return (
     <tbody
       data-slot="table-body"
@@ -47,10 +38,7 @@ function TableBody({
   )
 }
 
-function TableFooter({
-  className,
-  ...props
-}) {
+function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   return (
     <tfoot
       data-slot="table-footer"
@@ -63,10 +51,7 @@ function TableFooter({
   )
 }
 
-function TableRow({
-  className,
-  ...props
-}) {
+function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
       data-slot="table-row"
@@ -79,10 +64,7 @@ function TableRow({
   )
 }
 
-function TableHead({
-  className,
-  ...props
-}) {
+function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   return (
     <th
       data-slot="table-head"
@@ -95,10 +77,7 @@ function TableHead({
   )
 }
 
-function TableCell({
-  className,
-  ...props
-}) {
+function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   return (
     <td
       data-slot="table-cell"
@@ -114,7 +93,7 @@ function TableCell({
 function TableCaption({
   className,
   ...props
-}) {
+}: React.ComponentProps<"caption">) {
   return (
     <caption
       data-slot="table-caption"

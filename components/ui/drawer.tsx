@@ -1,9 +1,17 @@
-"use client";
+"use client"
+
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer"
 import { cn } from "cn"
 
-const DrawerContext = React.createContext(null)
+type DrawerContextProps = {
+  hasSnapPoints: boolean
+  modal: DrawerPrimitive.Root.Props["modal"]
+  showSwipeHandle: boolean
+  swipeDirection: NonNullable<DrawerPrimitive.Root.Props["swipeDirection"]>
+}
+
+const DrawerContext = React.createContext<DrawerContextProps | null>(null)
 
 function useDrawer() {
   const context = React.useContext(DrawerContext)
@@ -21,6 +29,8 @@ function Drawer({
   snapPoints,
   swipeDirection = "down",
   ...props
+}: DrawerPrimitive.Root.Props & {
+  showSwipeHandle?: boolean
 }) {
   const hasSnapPoints = snapPoints != null && snapPoints.length > 0
   const contextValue = React.useMemo(
@@ -41,28 +51,22 @@ function Drawer({
   )
 }
 
-function DrawerTrigger({
-  ...props
-}) {
+function DrawerTrigger({ ...props }: DrawerPrimitive.Trigger.Props) {
   return <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />
 }
 
-function DrawerPortal({
-  ...props
-}) {
+function DrawerPortal({ ...props }: DrawerPrimitive.Portal.Props) {
   return <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />
 }
 
-function DrawerClose({
-  ...props
-}) {
+function DrawerClose({ ...props }: DrawerPrimitive.Close.Props) {
   return <DrawerPrimitive.Close data-slot="drawer-close" {...props} />
 }
 
 function DrawerOverlay({
   className,
   ...props
-}) {
+}: DrawerPrimitive.Backdrop.Props) {
   return (
     <DrawerPrimitive.Backdrop
       data-slot="drawer-overlay"
@@ -78,7 +82,7 @@ function DrawerOverlay({
 function DrawerSwipeHandle({
   className,
   ...props
-}) {
+}: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-swipe-handle"
@@ -96,7 +100,7 @@ function DrawerContent({
   className,
   children,
   ...props
-}) {
+}: DrawerPrimitive.Popup.Props) {
   const { hasSnapPoints, modal, showSwipeHandle, swipeDirection } = useDrawer()
   const swipeAxis =
     swipeDirection === "down" || swipeDirection === "up" ? "y" : "x"
@@ -159,10 +163,7 @@ function DrawerContent({
   )
 }
 
-function DrawerHeader({
-  className,
-  ...props
-}) {
+function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-header"
@@ -175,10 +176,7 @@ function DrawerHeader({
   )
 }
 
-function DrawerFooter({
-  className,
-  ...props
-}) {
+function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-footer"
@@ -188,10 +186,7 @@ function DrawerFooter({
   )
 }
 
-function DrawerTitle({
-  className,
-  ...props
-}) {
+function DrawerTitle({ className, ...props }: DrawerPrimitive.Title.Props) {
   return (
     <DrawerPrimitive.Title
       data-slot="drawer-title"
@@ -207,7 +202,7 @@ function DrawerTitle({
 function DrawerDescription({
   className,
   ...props
-}) {
+}: DrawerPrimitive.Description.Props) {
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"

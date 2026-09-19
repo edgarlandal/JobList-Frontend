@@ -15,9 +15,7 @@ import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react"
 
 const Combobox = ComboboxPrimitive.Root
 
-function ComboboxValue({
-  ...props
-}) {
+function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
   return <ComboboxPrimitive.Value data-slot="combobox-value" {...props} />
 }
 
@@ -25,7 +23,7 @@ function ComboboxTrigger({
   className,
   children,
   ...props
-}) {
+}: ComboboxPrimitive.Trigger.Props) {
   return (
     <ComboboxPrimitive.Trigger
       data-slot="combobox-trigger"
@@ -38,10 +36,7 @@ function ComboboxTrigger({
   )
 }
 
-function ComboboxClear({
-  className,
-  ...props
-}) {
+function ComboboxClear({ className, ...props }: ComboboxPrimitive.Clear.Props) {
   return (
     <ComboboxPrimitive.Clear
       data-slot="combobox-clear"
@@ -61,6 +56,9 @@ function ComboboxInput({
   showTrigger = true,
   showClear = false,
   ...props
+}: ComboboxPrimitive.Input.Props & {
+  showTrigger?: boolean
+  showClear?: boolean
 }) {
   return (
     <InputGroup className={cn("w-auto", className)}>
@@ -94,7 +92,11 @@ function ComboboxContent({
   alignOffset = 0,
   anchor,
   ...props
-}) {
+}: ComboboxPrimitive.Popup.Props &
+  Pick<
+    ComboboxPrimitive.Positioner.Props,
+    "side" | "align" | "sideOffset" | "alignOffset" | "anchor"
+  >) {
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner
@@ -116,10 +118,7 @@ function ComboboxContent({
   )
 }
 
-function ComboboxList({
-  className,
-  ...props
-}) {
+function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   return (
     <ComboboxPrimitive.List
       data-slot="combobox-list"
@@ -136,7 +135,7 @@ function ComboboxItem({
   className,
   children,
   ...props
-}) {
+}: ComboboxPrimitive.Item.Props) {
   return (
     <ComboboxPrimitive.Item
       data-slot="combobox-item"
@@ -158,10 +157,7 @@ function ComboboxItem({
   )
 }
 
-function ComboboxGroup({
-  className,
-  ...props
-}) {
+function ComboboxGroup({ className, ...props }: ComboboxPrimitive.Group.Props) {
   return (
     <ComboboxPrimitive.Group
       data-slot="combobox-group"
@@ -174,7 +170,7 @@ function ComboboxGroup({
 function ComboboxLabel({
   className,
   ...props
-}) {
+}: ComboboxPrimitive.GroupLabel.Props) {
   return (
     <ComboboxPrimitive.GroupLabel
       data-slot="combobox-label"
@@ -184,18 +180,13 @@ function ComboboxLabel({
   )
 }
 
-function ComboboxCollection({
-  ...props
-}) {
+function ComboboxCollection({ ...props }: ComboboxPrimitive.Collection.Props) {
   return (
     <ComboboxPrimitive.Collection data-slot="combobox-collection" {...props} />
   )
 }
 
-function ComboboxEmpty({
-  className,
-  ...props
-}) {
+function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
   return (
     <ComboboxPrimitive.Empty
       data-slot="combobox-empty"
@@ -211,7 +202,7 @@ function ComboboxEmpty({
 function ComboboxSeparator({
   className,
   ...props
-}) {
+}: ComboboxPrimitive.Separator.Props) {
   return (
     <ComboboxPrimitive.Separator
       data-slot="combobox-separator"
@@ -224,7 +215,8 @@ function ComboboxSeparator({
 function ComboboxChips({
   className,
   ...props
-}) {
+}: React.ComponentPropsWithRef<typeof ComboboxPrimitive.Chips> &
+  ComboboxPrimitive.Chips.Props) {
   return (
     <ComboboxPrimitive.Chips
       data-slot="combobox-chips"
@@ -242,6 +234,8 @@ function ComboboxChip({
   children,
   showRemove = true,
   ...props
+}: ComboboxPrimitive.Chip.Props & {
+  showRemove?: boolean
 }) {
   return (
     <ComboboxPrimitive.Chip
@@ -269,7 +263,7 @@ function ComboboxChip({
 function ComboboxChipsInput({
   className,
   ...props
-}) {
+}: ComboboxPrimitive.Input.Props) {
   return (
     <ComboboxPrimitive.Input
       data-slot="combobox-chip-input"
@@ -280,7 +274,7 @@ function ComboboxChipsInput({
 }
 
 function useComboboxAnchor() {
-  return React.useRef(null);
+  return React.useRef<HTMLDivElement | null>(null)
 }
 
 export {
