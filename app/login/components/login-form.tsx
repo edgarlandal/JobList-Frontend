@@ -1,21 +1,21 @@
 "use client";
 
-import axios from "axios";
-
-import { SubmitEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-import api from "@/lib/api";
+import { PasswordField } from "@/components/auth/password-field";
+
+import { login } from "@/service/auth";
+import { apiErrorMessage } from "@/lib/api-error";
 
 export function LoginForm() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -26,31 +26,12 @@ export function LoginForm() {
     setError("");
     setLoading(true);
 
-    const formData = new URLSearchParams();
-    formData.set("username", username);
-    formData.set("password", password);
-
     try {
-      await api.post("auth/login", formData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
+      await login(username, password);
       router.push("/dashboard");
+      router.refresh();
     } catch (error: unknown) {
-      if (axios.isAxiosError<LoginErrorResponse>(error)) {
-        const detail = error.response.data.detail;
-
-        setError(
-          Array.isArray(detail)
-            ? detail
-                .map((item) => `${item.loc.join(".")} : ${item.msg}`)
-                .join("\n")
-            : typeof detail === "string"
-              ? detail
-              : "Unable to sign in. Please try again.",
-        );
-      } else {
-        setError("An unexpected error ocurred. Please try again");
-      }
+      setError(apiErrorMessage(error, "Unable to sign in. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -81,42 +62,8 @@ export function LoginForm() {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label
-          htmlFor="password"
-          className="text-sm font-medium text-slate-700"
-        >
-          Password
-        </Label>
-        <div className="relative">
-          <Input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            disabled={loading}
-            placeholder="Enter your password"
-            required
-            className="h-11 rounded-lg border-slate-200 bg-slate-50 pl-3 pr-12 placeholder:text-slate-400 focus-visible:border-teal-600 focus-visible:ring-teal-600/15"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            disabled={loading}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            aria-pressed={showPassword}
-            className="absolute right-0 top-0 flex size-11 items-center justify-center rounded-lg text-slate-400 transition-colors hover:text-teal-700 focus-visible:outline-2 focus-visible:outline-teal-600 disabled:opacity-50"
-          >
-            {showPassword ? (
-              <EyeOff aria-hidden="true" className="size-4" />
-            ) : (
-              <Eye aria-hidden="true" className="size-4" />
-            )}
-          </button>
-        </div>
-      </div>
+      <PasswordField autoComplete="current-password" placeholder="Enter your password"
+        value={password} onChange={(event) => setPassword(event.target.value)} disabled={loading} />
 
       {error && (
         <p

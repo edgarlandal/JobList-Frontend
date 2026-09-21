@@ -1,10 +1,11 @@
-import { ModalCreateJob } from "./modal";
+import { CreateJobDrawer } from "./create-job-drawer";
 
 type JobsHeaderProps = {
   total: number;
+  onCreated: () => void;
 };
 
-export function JobsHeader({ total }: JobsHeaderProps) {
+export function JobsHeader({ total, onCreated }: JobsHeaderProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#0F766E]/30 bg-[linear-gradient(115deg,#0F172A_0%,#0F766E_100%)] p-6 shadow-sm md:p-8">
       <div>
@@ -26,7 +27,7 @@ export function JobsHeader({ total }: JobsHeaderProps) {
         </p>
       </div>
 
-      <ModalCreateJob />
+      <CreateJobDrawer onCreated={onCreated} />
     </div>
   );
 }

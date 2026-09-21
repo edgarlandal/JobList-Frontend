@@ -1,31 +1,10 @@
-import { NextResponse } from "next/server";
 import { authCookieOptions } from "@/lib/server/cookies";
-import type {
-  ApiError,
-  LoginRequest,
-  LoginResponse,
-  TokenResponse,
-} from "@/types/auth";
-import { error } from "node:console";
-
-function isLoginRequest(value: unknown): value is LoginRequest {
-  if (typeof value !== "object" || value === null) return false;
-
-  const data = value as Record<string, unknown>;
-
-  return (
-    typeof data.email === "string" &&
-    data.email.trim().length > 0 &&
-    typeof data.password === "string" &&
-    data.password.length > 0
-  );
-}
+import { apiResponse, backendFetch, checkOrigin } from "@/lib/server/api";
+import type { TokenResponse } from "@/types/auth";
 
 function isTokenResponse(value: unknown): value is TokenResponse {
-  if (typeof value !== "object" || value === null) return false;
-
+  if (!value || typeof value !== "object") return false;
   const data = value as Record<string, unknown>;
-
   return (
     typeof data.access_token === "string" &&
     data.access_token.length > 0 &&
@@ -34,91 +13,62 @@ function isTokenResponse(value: unknown): value is TokenResponse {
   );
 }
 
-function errorResponse(message: string, status: number) {
-  return NextResponse.json<ApiError>(
-    { message },
-    {
-      status,
-
-      headers: { "Cache-Control": "no-store" },
-    },
-  );
-}
-
 export async function POST(request: Request) {
-  const apiUrl = process.env.FASTAPI_URL;
-  const appOrigin = process.env.APP_ORIGIN;
-
-  if (!apiUrl || !appOrigin)
-    return errorResponse("Configuration of server incomplete", 500);
-
-  if (request.headers.get("origin") !== appOrigin)
-    return errorResponse("Orign not permit ", 403);
-
-  const body: unknown = await request.json().catch(() => null);
-
-  if (!isLoginRequest(body))
-    return errorResponse("Email and password is required", 400);
-
+  const rejected = checkOrigin(request);
+  if (rejected) return rejected;
+  const body = await request.json().catch(() => null);
+  if (
+    !body ||
+    typeof body.email !== "string" ||
+    !body.email.trim() ||
+    typeof body.password !== "string" ||
+    !body.password
+  ) {
+    return apiResponse({ message: "Email and password are required." }, 400);
+  }
   try {
-    const upstream = await fetch(`${apiUrl}/api/v1/auth/login`, {
+    const upstream = await backendFetch("auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: body.email,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        username: body.email.trim(),
         password: body.password,
       }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
     });
-
     if (!upstream.ok) {
-      if ([400, 401, 403].includes(upstream.status)) {
-        return errorResponse("Login is failed for credentials", 401);
-      }
-
-      if (upstream.status === 429) {
-        return errorResponse("Too long tries", 429);
-      }
-
-      return errorResponse(
-        "The services of authetification is not available",
+      if ([400, 401, 403].includes(upstream.status))
+        return apiResponse({ message: "Invalid email or password." }, 401);
+      if (upstream.status === 429)
+        return apiResponse(
+          { message: "Too many attempts. Please try again later." },
+          429,
+        );
+      return apiResponse(
+        { message: "The authentication service is unavailable." },
         502,
       );
     }
-
     const tokens: unknown = await upstream.json();
-
-    if (!isTokenResponse(tokens)) {
-      return errorResponse(
-        "Response of authentifications is unexpectedly",
+    if (!isTokenResponse(tokens))
+      return apiResponse(
+        { message: "Unexpected authentication response." },
         502,
       );
-    }
-
-    const response = NextResponse.json<LoginResponse>(
-      { success: true },
-      { headers: { "Cache-Control": "no-store" } },
-    );
-
+    const response = apiResponse({ success: true });
     response.cookies.set(
       "access_token",
       tokens.access_token,
       authCookieOptions,
     );
-
     response.cookies.set(
-      "refres_token",
+      "refresh_token",
       tokens.refresh_token,
       authCookieOptions,
     );
-
     return response;
-  } catch (error) {
-    return errorResponse(
-      "It was not possible to connect to the authentication",
+  } catch {
+    return apiResponse(
+      { message: "Unable to connect to the authentication service." },
       502,
     );
   }

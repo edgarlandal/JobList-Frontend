@@ -1,47 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Joblist
 
-## Getting Started
+Frontend con Next.js, React y TypeScript para registrar y gestionar postulaciones.
 
-First, run the development server:
+## Desarrollo
 
-```bash
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copia `.env.example` a `.env` y configura:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```dotenv
+FASTAPI_URL=http://localhost:8000/api/v1
+APP_ORIGIN=http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Inicia FastAPI por separado. `APP_ORIGIN` debe coincidir con la direcci?n del
+navegador. Reinicia Next.js cuando cambies estas variables.
 
-## Learn More
+## Organizaci?n
 
-To learn more about Next.js, take a look at the following resources:
+- `app/`: p?ginas y rutas HTTP de Next.js.
+- `app/dashboard/jobs/use-jobs.ts`: carga, cancelaci?n de peticiones, paginaci?n y borrado.
+- `app/dashboard/jobs/components/`: tabla, men? por fila y formularios de jobs.
+- `components/auth/`: tarjeta de autenticaci?n y campo de contrase?a compartidos.
+- `components/discard-changes-dialog.tsx`: confirmaci?n de cambios sin guardar.
+- `components/ui/`: componentes base de interfaz.
+- `service/`: llamadas HTTP y traducci?n entre los modelos de frontend y backend.
+- `lib/server/`: conexi?n con FastAPI, comprobaci?n de origen y cookies de sesi?n.
+- `lib/api-error.ts`: extracci?n com?n de mensajes de error.
+- `types/`: contratos de datos compartidos.
+- `tests/`: pruebas de los contratos HTTP con respuestas simuladas.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+El navegador llama a `/api` en Next.js. Las rutas del servidor a?aden el token
+de la cookie HttpOnly al comunicarse con FastAPI. Los jobs usan paginaci?n
+`limit`/`offset`, POST para crear, PATCH para editar y DELETE para eliminar.
+No hay datos de ejemplo como alternativa a la API.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Verificaci?n
 
-## Deploy on Vercel
+```sh
+npm run lint
+node node_modules/typescript/bin/tsc --noEmit --incremental false
+node --test tests/api-connection.test.cjs
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Las pruebas simulan el backend; no modifican registros reales.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Criterios del refactor
 
-## Colores
-Color	HEX	Uso
-Índigo	#4F46E5	Botón principal, enlaces y logo
-Índigo oscuro	#4338CA	Botón al pasar el cursor
-Verde azulado	#0F766E	Acentos y confirmaciones
-Azul noche	#0F172A	Títulos y texto principal
-Gris pizarra	#475569	Texto secundario
-Gris claro	#F8FAFC	Fondo general
-Blanco	#FFFFFF	Tarjetas y formularios
-Gris de borde	#CBD5E1	Bordes de campos
+Se separ? la gesti?n de datos de la p?gina de jobs y se extrajeron las piezas
+que se repet?an en autenticaci?n, selectores y di?logos. Los formularios conservan
+sus estados locales; no se a?adi? una abstracci?n gen?rica de formularios.
+Se retiraron `use-pagination`, los tipos de validaci?n de login sin uso y
+`jsconfig.json`, cuyo alias ya est? definido en `tsconfig.json`.
+
+La paginaci?n ahora est? tipada y aplica el bloqueo de interacci?n durante el
+borrado. La edici?n permite conservar un per?odo salarial no especificado.
+El hook de pantalla m?vil usa una suscripci?n con un valor estable para SSR.
+
+## Hallazgos pendientes
+
+- `/dashboard` todav?a es una p?gina vac?a; Interviews y Profile son opciones futuras.
+- La comprobaci?n de usuario para redirigir est? en `/`; el layout del dashboard
+  no realiza esa comprobaci?n. Las rutas de datos s? exigen una cookie de sesi?n
+  y FastAPI valida el token.
+- Se almacena el refresh token, pero no hay un flujo de renovaci?n o cierre de sesi?n.
+- La paginaci?n muestra un bot?n por p?gina; para vol?menes grandes conviene limitar
+  los botones visibles.
+- Falta cobertura de interacci?n en navegador para men?s, drawers y formularios.
+
+Estos puntos requieren trabajo funcional adicional y no se cambiaron como parte
+de la reorganizaci?n del c?digo.

@@ -10,16 +10,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DiscardChangesDialog } from "@/components/discard-changes-dialog";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useId, useRef, useState, type ComponentProps } from "react";
@@ -32,13 +23,13 @@ type DrawerOpenChangeHandler = NonNullable<
   ComponentProps<typeof Drawer>
 >["onOpenChange"];
 
-export function ModalCreateJob() {
+export function CreateJobDrawer({ onCreated }: { onCreated: () => void }) {
+  const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [formVersion, setFormVersion] = useState(0);
   const hasChanges = useRef(false);
   
-  const keepEditingRef = useRef<HTMLButtonElement>(null);
   const formId = useId();
   const isMobile = useIsMobile();
 
@@ -50,6 +41,10 @@ export function ModalCreateJob() {
     nextOpen,
     eventDetails,
   ) => {
+    if (!nextOpen && saving) {
+      eventDetails.cancel();
+      return;
+    }
     if (!nextOpen && hasChanges.current) {
       eventDetails.cancel();
       setAlertOpen(true);
@@ -116,39 +111,17 @@ export function ModalCreateJob() {
             key={formVersion}
             formId={formId}
             markChanged={markChanged}
+            onSavingChange={setSaving}
+            onCreated={() => {
+              hasChanges.current = false;
+              setOpen(false);
+              setFormVersion((version) => version + 1);
+              onCreated();
+            }}
           />
         </div>
-        <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          <AlertDialogContent
-            initialFocus={keepEditingRef}
-            finalFocus={open}
-            className="w-[calc(100%-2rem)] border border-[#0F766E]/20 bg-[#E7F0F0] text-[#0F172A]"
-          >
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-lg font-bold">
-                Discard this application?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-[#475569]">
-                All entered information will be lost. Are you sure you want to
-                leave?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="border-[#0F766E]/20 bg-[#DCEBE9]">
-              <AlertDialogCancel
-                ref={keepEditingRef}
-                className="h-11 border-[#0F766E]/25 bg-[#F0F6F5] text-[#0F172A] hover:bg-[#D7E9E5]"
-              >
-                Keep editing
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={discardApplication}
-                className="h-11 bg-[#0F766E] text-white hover:bg-[#115E59]"
-              >
-                Discard application
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <DiscardChangesDialog open={alertOpen} onOpenChange={setAlertOpen}
+          onDiscard={discardApplication} restoreFocus={open} />
       </DrawerContent>
     </Drawer>
   );

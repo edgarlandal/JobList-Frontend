@@ -1,5 +1,9 @@
-import axios from "axios";
-import type { LoginRequest, LoginResponse } from "@/types/auth";
+import type { LoginRequest, LoginResponse, SignupRequest } from "@/types/auth";
+import api from "@/lib/api";
+
+export async function signup(body: SignupRequest): Promise<void> {
+  await api.post("auth/register", body);
+}
 
 export async function login(
   email: string,
@@ -7,7 +11,7 @@ export async function login(
 ): Promise<LoginResponse> {
   const body: LoginRequest = { email, password };
 
-  const { data } = await axios.post<LoginResponse>("/api/auth/login", body);
+  const { data } = await api.post<LoginResponse>("auth/login", body);
 
   return data;
 }

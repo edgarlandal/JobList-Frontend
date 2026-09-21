@@ -3,6 +3,13 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface SignupRequest {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+}
+
 export interface LoginResponse {
   success: boolean;
 }
@@ -10,10 +17,6 @@ export interface LoginResponse {
 export interface TokenResponse {
   access_token: string;
   refresh_token: string;
-}
-
-export interface ApiError {
-  message: string;
 }
 
 export interface User {

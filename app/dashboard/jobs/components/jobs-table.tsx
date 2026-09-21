@@ -1,3 +1,4 @@
+import { JobActions } from "./job-actions";
 import {
   Table,
   TableBody,
@@ -8,20 +9,14 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-export type Job = {
-  id: string | number;
-  enterprise: string;
-  role: string;
-  salary: number;
-  type_salary: string;
-  location: string;
-  mode: string;
-  status: string;
-  last_update_at: string;
-};
+import type { Job } from "@/types/job";
 
 type JobsTableProps = {
   jobs: Job[];
+  onSelect: (job: Job) => void;
+  onEdit: (job: Job) => void;
+  onDelete: (job: Job) => void;
+  disabled?: boolean;
 };
 
 const salaryFormatter = new Intl.NumberFormat("en-US", {
@@ -35,17 +30,16 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-const defaultStatusClass =
-  "bg-[#F8FAFC] text-[#475569] ring-[#CBD5E1]";
+const defaultStatusClass = "bg-[#F8FAFC] text-[#475569] ring-[#CBD5E1]";
 
 const statusClasses: Record<string, string | undefined> = {
-  "In progress": "bg-[#0F766E]/10 text-[#0F766E] ring-[#0F766E]/20",
-  HR: "bg-[#0F172A]/10 text-[#0F172A] ring-[#0F172A]/20",
-  Rejected: "bg-[#475569]/10 text-[#475569] ring-[#475569]/20",
+  "In Process": "bg-[#0F766E]/10 text-[#0F766E] ring-[#0F766E]/20",
+  RH: "bg-[#0F172A]/10 text-[#0F172A] ring-[#0F172A]/20",
+  Rejection: "bg-[#475569]/10 text-[#475569] ring-[#475569]/20",
   Cancelled: defaultStatusClass,
 };
 
-export function JobsTable({ jobs }: JobsTableProps) {
+export function JobsTable({ jobs, onSelect, onEdit, onDelete, disabled }: JobsTableProps) {
   return (
     <Table className="min-w-[960px] [&_th]:px-5 [&_td]:px-5 [&_td]:py-4">
       <TableCaption className="sr-only">
@@ -64,16 +58,14 @@ export function JobsTable({ jobs }: JobsTableProps) {
           <TableHead scope="col">Location</TableHead>
           <TableHead scope="col">Status</TableHead>
           <TableHead scope="col">Last updated</TableHead>
+          <TableHead scope="col" className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
         {jobs.length === 0 ? (
           <TableRow className="bg-[#F0F6F5] hover:bg-[#E0EEEB]">
-            <TableCell
-              colSpan={5}
-              className="h-40 text-center text-[#475569]"
-            >
+            <TableCell colSpan={6} className="h-40 text-center text-[#475569]">
               You have no applications yet.
             </TableCell>
           </TableRow>
@@ -81,9 +73,10 @@ export function JobsTable({ jobs }: JobsTableProps) {
           jobs.map((job) => (
             <TableRow
               key={job.id}
-              className="border-[#0F766E]/10 odd:bg-[#F0F6F5] even:bg-[#E7F0F0] hover:bg-[#D7E9E5]"
+              onClick={() => { if (!disabled) onSelect(job); }}
+              className="cursor-pointer border-[#0F766E]/10 odd:bg-[#F0F6F5] even:bg-[#E7F0F0] hover:bg-[#D7E9E5]"
             >
-              <TableCell className="min-w-32 max-w-48 whitespace-normal">
+              <TableCell className=" min-w-8 max-w-16 whitespace-normal">
                 <div className="flex items-center gap-3">
                   <span
                     aria-hidden="true"
@@ -93,9 +86,18 @@ export function JobsTable({ jobs }: JobsTableProps) {
                   </span>
 
                   <div className="min-w-0">
-                    <p className="font-bold leading-snug">
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onSelect(job);
+                      }}
+                      aria-label={`View application: ${job.enterprise.trim()}, ${job.role.trim()}`}
+                      className="rounded text-left font-bold leading-snug focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0F766E]"
+                    >
                       {job.enterprise.trim()}
-                    </p>
+                    </button>
 
                     <p className="mt-1 text-xs leading-relaxed text-[#475569]">
                       {job.role.trim()}
@@ -118,16 +120,12 @@ export function JobsTable({ jobs }: JobsTableProps) {
                     </p>
                   </>
                 ) : (
-                  <span className="text-xs text-[#475569]">
-                    Not specified
-                  </span>
+                  <span className="text-xs text-[#475569]">Not specified</span>
                 )}
               </TableCell>
 
               <TableCell className="text-[#475569]">
-                <p className="font-bold leading-snug">
-                  {job.location.trim()}
-                </p>
+                <p className="font-bold leading-snug">{job.location.trim()}</p>
 
                 <p className="mt-1 text-xs leading-relaxed text-[#475569]">
                   {job.mode.trim()}
@@ -150,10 +148,11 @@ export function JobsTable({ jobs }: JobsTableProps) {
 
               <TableCell className="text-xs text-[#475569] tabular-nums">
                 <time dateTime={job.last_update_at}>
-                  {dateFormatter.format(
-                    new Date(`${job.last_update_at}T00:00:00Z`),
-                  )}
+                  {dateFormatter.format(new Date(job.last_update_at))}
                 </time>
+              </TableCell>
+              <TableCell className="text-right" onClick={(event) => event.stopPropagation()}>
+                <JobActions job={job} onView={onSelect} onEdit={onEdit} onDelete={onDelete} disabled={disabled} />
               </TableCell>
             </TableRow>
           ))

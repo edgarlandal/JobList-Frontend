@@ -2,7 +2,18 @@
 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
-export function DataPagination({ total, startIndex, pageSize, currentPage, totalPages, onPageChange, onPageSizeChange }) {
+type DataPaginationProps = {
+  total: number;
+  startIndex: number;
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  disabled?: boolean;
+};
+
+export function DataPagination({ total, startIndex, pageSize, currentPage, totalPages, onPageChange, onPageSizeChange, disabled = false }: DataPaginationProps) {
   return (
     <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-[#0F766E]/20 bg-[#DCEBE9] px-5 py-4">
       <p
@@ -23,6 +34,7 @@ export function DataPagination({ total, startIndex, pageSize, currentPage, total
           Rows per page
           <select
             value={pageSize}
+            disabled={disabled}
             onChange={(event) => {
               onPageSizeChange(Number(event.target.value));
             }}
@@ -41,7 +53,7 @@ export function DataPagination({ total, startIndex, pageSize, currentPage, total
               <PaginationPrevious
                 text="Previous"
                 aria-label="Previous page"
-                disabled={currentPage === 1}
+                disabled={disabled || currentPage === 1}
                 onClick={() => onPageChange(currentPage - 1)}
               />
             </PaginationItem>
@@ -51,6 +63,7 @@ export function DataPagination({ total, startIndex, pageSize, currentPage, total
             ).map((number) => (
               <PaginationItem key={number}>
                 <PaginationLink
+                  disabled={disabled}
                   isActive={currentPage === number}
                   aria-label={`Page ${number}`}
                   onClick={() => onPageChange(number)}
@@ -63,7 +76,7 @@ export function DataPagination({ total, startIndex, pageSize, currentPage, total
               <PaginationNext
                 text="Next"
                 aria-label="Next page"
-                disabled={currentPage === totalPages}
+                disabled={disabled || currentPage === totalPages}
                 onClick={() => onPageChange(currentPage + 1)}
               />
             </PaginationItem>

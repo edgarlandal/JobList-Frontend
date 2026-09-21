@@ -38,6 +38,7 @@ type JobComboboxFieldProps = {
   items: string[];
   placeholder?: string;
   onValueChange?: (value: string | null) => void;
+  required?: boolean;
 };
 
 function JobField({
@@ -99,14 +100,16 @@ export function JobComboboxField({
   items,
   placeholder,
   onValueChange,
+  required,
 }: JobComboboxFieldProps) {
   const id = `${formId}-${name}`;
 
   return (
-    <JobField id={id} label={label}>
+    <JobField id={id} label={label} required={required}>
       <Combobox
         items={items}
         name={name}
+        required={required}
         onValueChange={onValueChange}
       >
         <ComboboxInput
@@ -127,6 +130,30 @@ export function JobComboboxField({
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
+    </JobField>
+  );
+}
+
+type JobSelectFieldProps = Omit<ComponentProps<"select">, "id" | "value"> & {
+  formId: string;
+  name: string;
+  label: string;
+  items: readonly string[];
+  value: string;
+};
+
+export function JobSelectField({ formId, name, label, items, value, ...props }: JobSelectFieldProps) {
+  const id = `${formId}-${name}`;
+  const options = Array.from(new Set([value, ...items]));
+
+  return (
+    <JobField id={id} label={label}>
+      <select {...props} id={id} name={name} value={value}
+        className="h-11 w-full rounded-md border border-[#0F766E]/25 bg-[#F8FAFC] px-3 text-sm text-[#0F172A] focus-visible:outline-2 focus-visible:outline-[#0F766E]">
+        {options.map((option) => (
+          <option key={option} value={option}>{option === "NA" ? "Not specified" : option}</option>
+        ))}
+      </select>
     </JobField>
   );
 }

@@ -2,6 +2,7 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import type { User } from "@/types/auth";
+import { backendFetch } from "./api";
 
 function isUser(value: unknown): value is User {
   if (typeof value !== "object" || value === null) return false;
@@ -20,16 +21,10 @@ export async function getCurrentUser(): Promise<User | null> {
 
   if (!token) return null;
 
-  const apiUrl = process.env.FASTAPI_URL;
-
-  if (!apiUrl) throw new Error("FASTAPI_URL configuration is missing");
-
-  const response = await fetch(`${apiUrl}/api/v1/user/me`, {
+  const response = await backendFetch("users/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    cache: "no-store",
-    signal: AbortSignal.timeout(10_000),
   });
 
   if (response.status === 401) return null;
